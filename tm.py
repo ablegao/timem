@@ -1,4 +1,4 @@
-﻿#!/opt/local/python3/bin/python3
+﻿#!/opt/local/python3/bin/pyvenv
 #-*- coding:utf-8 -*-
 
 import os, sys
@@ -80,22 +80,25 @@ class Application(Application_ui):
         showinfo(title='计时结束',message=message  )
     #更新时间进度 
     def remain_time_update(self):
-        self.time_status['text'] = "距离计时结束还有%d 秒" % (self.now_runtime_allsec,)
+        self.time_status['text'] = "距离计时结束还有%d分%d秒" % (self.now_runtime_allsec/60, self.now_runtime_allsec % 60, ) 
     
     #计时器。
     def renmain_time_thread(self):
-
+        for x in range(3):
+            self.time_status['text'] ="准备开始!计时三秒, %d秒" % (x+1,)
+            time.sleep(1)
         while self.now_runtime_allsec >0:
+            self.now_runtime_allsec = self.now_runtime_allsec-1
             if self.master.stop == True :
                 return False
             self.remain_time_update()
-            self.now_runtime_allsec = self.now_runtime_allsec-1
             time.sleep(1)     
         self.on_over()
         self.master.remain_time_thr = False
     #点击事件     
     def startbtn_Cmd(self, event=None):
-        self.time_long = int(self.time_number.get()) * 60 
+        #时间+1秒修正用户点击时的时间消耗
+        self.time_long = int(self.time_number.get()) * 60 + 1 
         self.now_runtime_allsec = self.time_long
         self.startbtn['state'] = 'disabled'
         #启动一个线程
